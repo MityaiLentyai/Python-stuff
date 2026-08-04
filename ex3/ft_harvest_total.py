@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
-def ft_plot_area():
+def ft_harvest_total():
     sum = 0
-    for i in range(1, 4):
+    i = 1
+    while i <= 3:
         print(f"Day {i} harvest: ", end="")
         sum += int(input())
+        i += 1
     print(f"Total harvest: {sum}")
 
 
-ft_plot_area()
+ft_harvest_total()
