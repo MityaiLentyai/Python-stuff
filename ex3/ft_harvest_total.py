@@ -8,6 +8,3 @@ def ft_harvest_total():
         sum += int(input())
         i += 1
     print(f"Total harvest: {sum}")
-
-
-ft_harvest_total()
