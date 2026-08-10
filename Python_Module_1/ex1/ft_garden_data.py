@@ -8,7 +8,6 @@ class Plant:
         self.age = age
 
     def show(plant):
-        print("=== Garden Plant Registry ===")
         if not plant:
             print("No plants received yet")
             return
@@ -19,6 +18,7 @@ class Plant:
 
 def main():
 
+    print("=== Garden Plant Registry ===")
     rose = Plant("rose", 25, 30)
     sunflower = Plant("sunflower", 80, 45)
     cactus = Plant("cactus", 15, 120)
