@@ -2,33 +2,29 @@
 
 class Plant:
 
-    all_plants: list["Plant"] = []
-
     def __init__(self, name,  height,  age):
         self.name = name
         self.height = height
         self.age = age
 
-        Plant.all_plants.append(self)
-
-    @classmethod
-    def show(cls):
+    def show(plant):
         print("=== Garden Plant Registry ===")
-        if not Plant.all_plants:
+        if not plant:
             print("No plants received yet")
             return
 
-        for plant in cls.all_plants:
-            print(f"{plant.name.capitalize()}: {plant.height}cm, "
-                  f"{plant.age} days old")
+        print(f"{plant.name.capitalize()}: {plant.height}cm, "
+              f"{plant.age} days old")
 
 
 def main():
 
-    Plant("rose", 25, 30)
-    Plant("sunflower", 80, 45)
-    Plant("cactus", 15, 120)
-    Plant.show()
+    rose = Plant("rose", 25, 30)
+    sunflower = Plant("sunflower", 80, 45)
+    cactus = Plant("cactus", 15, 120)
+    Plant.show(rose)
+    Plant.show(sunflower)
+    Plant.show(cactus)
 
 
 if __name__ == "__main__":
