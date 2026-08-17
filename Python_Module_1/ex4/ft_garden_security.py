@@ -5,21 +5,40 @@ class Plant:
 
     def __init__(self, _name: str, _height: float, _age_days: int):
         self._name: str = _name
-        self._height: float = _height
-        self._age_days: int = _age_days
+        if _height >= 0:
+            self._height = _height
+        else:
+            self._height = 0.0  # How else am I supposed to handle it?
+            print(
+                f"{self._name.capitalize()}: Error, height can't be negative."
+                f" Defaulting to 0.0cm"
+            )
+        if _age_days >= 0:
+            self._age_days = _age_days
+        else:
+            self._age_days = 0.0  # Same
+            print(
+                f"{self._name.capitalize()}: Error, age can't be negative."
+                f" Defaulting to 0 days"
+            )
 
-    # fmt: off
     def show(self) -> None:
-        print(f"{self._name.capitalize()}: {self._height}cm, "
-              f"{self._age_days} days old")
-    # fmt: on
+        print(
+            f"{self._name.capitalize()}: {self._height}cm, "
+            f"{self._age_days} days old"
+        )
 
     def set_height(self, new_height: float) -> None:
         if new_height > 0:
             self._height = new_height
             print(f"Height updated: {int(self._height)}cm")
         else:
-            print(f"{self._name.capitalize()}: Error, height can't be negative")
+            # fmt: off
+            print(
+                f"{self._name.capitalize()}: Error, "
+                f"height can't be negative"
+            )
+            # fmt: on
             print("Height update rejected")
 
     def set_age(self, new_age: int) -> None:
