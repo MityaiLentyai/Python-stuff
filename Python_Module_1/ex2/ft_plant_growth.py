@@ -2,8 +2,6 @@
 
 class Plant:
 
-    all_plants: list["Plant"] = []
-
     def __init__(self, name: str,  height: float,  age_days: int):
         self.name: str = name
         self.height: float = height
