@@ -16,7 +16,7 @@ class Plant:
         if _age_days >= 0:
             self._age_days = _age_days
         else:
-            self._age_days = 0.0  # Same
+            self._age_days = 0  # Same
             print(
                 f"{self._name.capitalize()}: Error, age can't be negative."
                 f" Defaulting to 0 days"
