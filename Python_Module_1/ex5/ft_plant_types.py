@@ -28,6 +28,12 @@ class Plant:
             f"{self._age_days} days old"
         )
 
+    def age(self):
+        self._age_days += 1
+
+    def grow(self):
+        self._height = round(self._height * 1.119, 1)
+
 
 class Flower(Plant):
     # fmt: off
@@ -41,15 +47,12 @@ class Flower(Plant):
     # fmt: on
 
     def show(self):
-        print(
-            f"{self._name.capitalize()}: {self._height}cm, "
-            f"{self._age_days} days old"
-        )
+        super().show()
         print(f" Color: {self._color}")
         if self._is_bloomed:
-            print(" Rose is blooming beautifully!")
+            print(f" {self._name.capitalize()} is blooming beautifully!")
         else:
-            print(" Rose has not bloomed yet")
+            print(f" {self._name.capitalize()} has not bloomed yet")
 
     def bloom(self):
         print("[asking the rose to bloom]")
@@ -75,10 +78,7 @@ class Tree(Plant):
         )
 
     def show(self):
-        print(
-            f"{self._name.capitalize()}: {self._height}cm, "
-            f"{self._age_days} days old"
-        )
+        super().show()
         print(f" Trunk diameter: {self._trunk_diameter}")
 
 
@@ -95,10 +95,7 @@ class Vegetable(Plant):
     # fmt: on
 
     def show(self) -> None:
-        print(
-            f"{self._name.capitalize()}: {self._height}cm, "
-            f"{self._age_days} days old"
-        )
+        super().show()
         print(f" Harvest season: {self._harvest_season}")
         print(f" Nutritional value: {self._nutritional_value}")
 
@@ -117,7 +114,7 @@ def main() -> None:
         _height=5.0,
         _age_days=10,
         _harvest_season="April",
-        _nutritional_value=20,
+        _nutritional_value=0,
     )
     # fmt: on
     print(f"=== {rose.__class__.__name__.capitalize()}")
@@ -134,14 +131,13 @@ def main() -> None:
 
     print(f"=== {tomato.__class__.__name__.capitalize()}")
     tomato.show()
+    print("[make tomato grow and age for 20 days]")
+    for day in range(20):
+        tomato.age()
+        tomato.grow()
+        tomato._nutritional_value += 1
+    tomato.show()
 
 
 if __name__ == "__main__":
     main()
-    # garden: list[Plant] = [
-    #     Plant("Rose", 25.0, 30),
-    #     Plant("Bamboo", 80.0, 10),
-    #     Plant("Cactus", 10.0, 100),
-    #     Plant("Sunflower", 40.0, 45),
-    #     Plant("Cactus", 15.0, 120)
-    # ]
