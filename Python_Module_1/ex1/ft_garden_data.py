@@ -7,13 +7,13 @@ class Plant:
         self.height = height
         self.age = age
 
-    def show(plant):
-        if not plant:
+    def show(self):
+        if not self.name:
             print("No plants received yet")
             return
 
-        print(f"{plant.name.capitalize()}: {plant.height}cm, "
-              f"{plant.age} days old")
+        print(f"{self.name.capitalize()}: {self.height}cm, "
+              f"{self.age} days old")
 
 
 def main():
@@ -22,9 +22,9 @@ def main():
     rose = Plant("rose", 25, 30)
     sunflower = Plant("sunflower", 80, 45)
     cactus = Plant("cactus", 15, 120)
-    Plant.show(rose)
-    Plant.show(sunflower)
-    Plant.show(cactus)
+    rose.show()
+    sunflower.show()
+    cactus.show()
 
 
 if __name__ == "__main__":
