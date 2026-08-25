@@ -14,9 +14,6 @@ class Plant:
         self.height = round(self.height * 1.01, 1)
 
     def show(self):
-        if not self.name:
-            print("No plants received yet")
-            return
 
         print(f"{self.name.capitalize()}: {self.height}cm, "
               f"{self.age_days} days old")

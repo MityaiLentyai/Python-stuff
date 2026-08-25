@@ -8,9 +8,6 @@ class Plant:
         self.age = age
 
     def show(self):
-        if not self.name:
-            print("No plants received yet")
-            return
 
         print(f"{self.name.capitalize()}: {self.height}cm, "
               f"{self.age} days old")
