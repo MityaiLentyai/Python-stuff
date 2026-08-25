@@ -9,6 +9,7 @@ def main() -> None:
     print(f"Plant: {name.capitalize()}")
     print(f"Height: {height}cm")
     print(f"Age: {age}days")
+    print("\n === End of Program ===")
 
 
 if __name__ == "__main__":

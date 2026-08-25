@@ -6,9 +6,9 @@ class Plant:
     class _PlantStats:
 
         def __init__(self):
-            self._grow_count: int = 0
-            self._age_count: int = 0
-            self._show_count: int = 0
+            self._grow_count = 0
+            self._age_count = 0
+            self._show_count = 0
 
         def display(self, plant_name: str) -> None:
             print(f"[statisics for {plant_name.capitalize()}]")
