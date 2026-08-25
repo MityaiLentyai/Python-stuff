@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 class Plant:
 
     def __init__(self, name: str, height: float, age_days: int):
@@ -18,10 +19,11 @@ def main() -> None:
         Plant("Bamboo", 80.0, 10),
         Plant("Cactus", 10.0, 100),
         Plant("Sunflower", 40.0, 45),
-        Plant("Cactus", 15.0, 120)
+        Plant("Cactus", 15.0, 120),
     ]
 
     for plant in garden:
+        print("Created: ", end="")
         plant.show()
 
 
