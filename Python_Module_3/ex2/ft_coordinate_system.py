@@ -1,10 +1,10 @@
 import math
 
 
-def game():
+def game() -> None:
     print("=== Game Coordinate System ===\n")
     print("Get a first set of coordinates")
-    first_set: tuple = coordinate_input_1()
+    first_set: tuple[float, float, float] = coordinate_input_1()
     distance_to_center = math.sqrt(
         (first_set[0] - 0.0) ** 2
         + (first_set[1] - 0.0) ** 2
@@ -12,7 +12,7 @@ def game():
     )
     print(f"Distance to center: {round(distance_to_center, 4)}\n")
     print("Get a second set of coordinates")
-    second_set: tuple = coordinate_input_2()
+    second_set: tuple[float, float, float] = coordinate_input_2()
     distance_between_the_two = math.sqrt(
         (first_set[0] - second_set[0]) ** 2
         + (first_set[1] - second_set[1]) ** 2
@@ -24,7 +24,7 @@ def game():
     )
 
 
-def coordinate_input_1() -> tuple:
+def coordinate_input_1() -> tuple[float, float, float]:
     while True:
         # fmt: off
         try:
@@ -45,7 +45,7 @@ def coordinate_input_1() -> tuple:
         # fmt: on
 
 
-def coordinate_input_2() -> tuple:
+def coordinate_input_2() -> tuple[float, float, float]:
     while True:
         # fmt: off
         try:

@@ -33,7 +33,7 @@
 import sys
 
 
-def try_int(val: str):
+def try_int(val: str) -> int | None:
     try:
         return int(val)
     except Exception:
@@ -47,14 +47,14 @@ def script() -> None:
     scores = [score for score in processed if score is not None]
 
     if len(scores) == 0:
-        print("No scores provided.", end="")
+        print("No scores provided. ", end="")
         print("Usage: python3 ft_score_analytics.py <score1> <score2> ...")
         return
 
     try:
-        print(f"Scores processed {scores}")
-        print(f"Total score: {sum(scores)}")
+        print(f"Scores processed: {scores}")
         print(f"Total players: {len(scores)}")
+        print(f"Total score: {sum(scores)}")
         print(f"Total score: {sum(scores)}")
         print(f"Average score: {(sum(scores))/(len(scores))}")
         print(f"High score: {max(scores)}")

@@ -1,7 +1,7 @@
 import random
 
 
-def gen_player_achivements():
+def gen_player_achivements() -> None:
     player_names = ["Emma", "Liam", "Sophia", "Ethan"]
     achivements = [
         "Monster Hunter",
