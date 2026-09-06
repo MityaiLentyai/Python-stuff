@@ -6,8 +6,8 @@ import typing
 class DataProcessor(ABC):
 
     def __init__(self) -> None:
-        self._data: list[str] = []
         self._extracted_count: int = 0
+        self._data: list[str] = []
 
     @abstractmethod
     def validate(self, data: typing.Any) -> bool:
@@ -50,22 +50,25 @@ class NumericProcessor(DataProcessor):
 
 class TextProcessor(DataProcessor):
 
-    @abstractmethod
     def validate(self, data: typing.Any) -> bool:
-        pass
+        if isinstance(data, str) or isinstance(data, list) and all(isinstance(x, str) for x in data):
+            return True
+        return False
 
-    @abstractmethod
     def ingest(self, data: str | list[str]) -> None:
-        pass
+        if not self.validate(data):
+            raise TypeError("Improper text data")
+        if isinstance(data, list):
+            self._data.extend(data) #because they want as separate strings/could be done with for
+        else:
+            self._data.append(data)
 
 
 class LogProcessor(DataProcessor):
 
-    @abstractmethod
     def validate(self, data: str) -> bool:
         pass
 
-    @abstractmethod
     def ingest(self, data: typing.Any) -> None:
         pass
 
@@ -92,7 +95,17 @@ def main():
         print(f" Numeric value {i}: {numeric_processor.output()[0]}")
 
     print("\nTesting Text Processor...")
+    text_processor = TextProcessor()
+    print(f" Trying to validate input '42': {text_processor.validate(42)}")
+    test_list = ["Hello","Nexus","World"]
+    print(f" Processing data: {test_list}")
+    text_processor.ingest(test_list)
+    print(f" Extracting 1 value... \n"
+          f" Text value 0: {text_processor.output()[0]}")
 
+    print("\nTesting Log Processor...")
+    log_processor = LogProcessor()
+    print(f" Trying to validate input 'Hello': {log_processor.validate('Hello')}")
 
 if __name__ == "__main__":
     main()
