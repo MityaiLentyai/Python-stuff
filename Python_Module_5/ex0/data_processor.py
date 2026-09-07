@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
-from collections.abc import Sequence
-import typing
+from typing import Any
 
 
 class DataProcessor(ABC):
@@ -10,11 +9,11 @@ class DataProcessor(ABC):
         self._data: list[str] = []
 
     @abstractmethod
-    def validate(self, data: typing.Any) -> bool:
+    def validate(self, data: Any) -> bool:
         pass
 
     @abstractmethod
-    def ingest(self, data: typing.Any) -> None:
+    def ingest(self, data: Any) -> None:
         pass
 
     def output(self) -> tuple[int, str] | None:
@@ -26,7 +25,7 @@ class DataProcessor(ABC):
 
 class NumericProcessor(DataProcessor):
 
-    def validate(self, data: typing.Any) -> bool:
+    def validate(self, data: Any) -> bool:
         if isinstance(data, bool):
             return False
         if isinstance(data, (int, float)):
@@ -50,7 +49,7 @@ class NumericProcessor(DataProcessor):
 
 class TextProcessor(DataProcessor):
 
-    def validate(self, data: typing.Any) -> bool:
+    def validate(self, data: Any) -> bool:
         if isinstance(data, str) or isinstance(data, list) and all(isinstance(x, str) for x in data):
             return True
         return False
@@ -66,12 +65,27 @@ class TextProcessor(DataProcessor):
 
 class LogProcessor(DataProcessor):
 
-    def validate(self, data: str) -> bool:
-        pass
+    def validate(self, data: Any) -> bool:
+        if isinstance(data, dict):
+            return all(isinstance(k, str) and isinstance(v, str) for k, v in data.items())
+        if isinstance(data, list):
+            return all(
+                isinstance(item, dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in item.items())
+                for item in data
+            )
+        return False
 
-    def ingest(self, data: typing.Any) -> None:
-        pass
-
+    def ingest(self, data: dict[str, str] | list[dict[str, str]]) -> None:
+        if not self.validate(data):
+            raise TypeError("Improper log data")
+        else:
+            if isinstance(data, list):
+                for dct in data:
+                    self._data.append(
+                        f"{dct['log_level']}: {dct['log_message']}")
+            else:
+                self._data.append(
+                    f"{data['log_level']}: {data['log_message']}")
 
 def main():
     print("=== Code Nexus - Data Processor ===\n")
@@ -101,11 +115,17 @@ def main():
     print(f" Processing data: {test_list}")
     text_processor.ingest(test_list)
     print(f" Extracting 1 value... \n"
-          f" Text value 0: {text_processor.output()[0]}")
+          f" Text value 0: {text_processor.output()[1]}")
 
     print("\nTesting Log Processor...")
     log_processor = LogProcessor()
     print(f" Trying to validate input 'Hello': {log_processor.validate('Hello')}")
+    test_list = [{'log_level': 'NOTICE', 'log_message': 'Connection to server'},
+                 {'log_level': 'ERROR', 'log_message': 'Unauthorized access!!'}]
+    print(" Extracting 2 values...")
+    log_processor.ingest(test_list)
+    for i in range(2):
+        print(f" Log entry {i}: {log_processor.output()}")
 
 if __name__ == "__main__":
     main()
