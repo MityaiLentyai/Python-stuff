@@ -48,7 +48,8 @@ class NumericProcessor(DataProcessor):
 class TextProcessor(DataProcessor):
 
     def validate(self, data: Any) -> bool:
-        if isinstance(data, str) or isinstance(data, list) and all(isinstance(x, str) for x in data):
+        if (isinstance(data, str) or isinstance(data, list) and
+                all(isinstance(x, str) for x in data)):
             return True
         return False
 
@@ -56,7 +57,8 @@ class TextProcessor(DataProcessor):
         if not self.validate(data):
             raise TypeError("Improper text data")
         if isinstance(data, list):
-            self._data.extend(data) #because they want as separate strings/could be done with for
+            self._data.extend(
+                data)  # because they want as separate strings
         else:
             self._data.append(data)
 
@@ -65,10 +67,13 @@ class LogProcessor(DataProcessor):
 
     def validate(self, data: Any) -> bool:
         if isinstance(data, dict):
-            return all(isinstance(k, str) and isinstance(v, str) for k, v in data.items())
+            return all(isinstance(k, str) and isinstance(v, str) for k, v in
+                       data.items())
         if isinstance(data, list):
             return all(
-                isinstance(item, dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in item.items())
+                isinstance(item, dict) and all(
+                    isinstance(k, str) and isinstance(v, str) for k, v in
+                    item.items())
                 for item in data
             )
         return False
@@ -85,6 +90,7 @@ class LogProcessor(DataProcessor):
                 self._data.append(
                     f"{data['log_level']}: {data['log_message']}")
 
+
 def main() -> None:
     print("=== Code Nexus - Data Processor ===\n")
 
@@ -94,7 +100,7 @@ def main() -> None:
           f" {numeric_processor.validate(42)}")
     print(f" Trying to validate input 'Hello'"
           f": {numeric_processor.validate('Hello')}")
-    print(f" Test invalid ingestion of string 'foo' without prior validation:")
+    print(" Test invalid ingestion of string 'foo' without prior validation:")
     try:
         numeric_processor.ingest('foo')  # type: ignore[arg-type]
     except TypeError as e:
@@ -109,7 +115,7 @@ def main() -> None:
     print("\nTesting Text Processor...")
     text_processor = TextProcessor()
     print(f" Trying to validate input '42': {text_processor.validate(42)}")
-    test_list_str: list[str] = ["Hello","Nexus","World"]
+    test_list_str: list[str] = ["Hello", "Nexus", "World"]
     print(f" Processing data: {test_list_str}")
     text_processor.ingest(test_list_str)
     print(f" Extracting 1 value... \n"
@@ -117,14 +123,18 @@ def main() -> None:
 
     print("\nTesting Log Processor...")
     log_processor = LogProcessor()
-    print(f" Trying to validate input 'Hello': {log_processor.validate('Hello')}")
-    test_list_dict = [{'log_level': 'NOTICE', 'log_message': 'Connection to server'},
-                 {'log_level': 'ERROR', 'log_message': 'Unauthorized access!!'}]
+    print(f" Trying to validate input 'Hello': "
+          f"{log_processor.validate('Hello')}")
+    test_list_dict = [{'log_level': 'NOTICE',
+                       'log_message': 'Connection to server'},
+                      {'log_level': 'ERROR',
+                       'log_message': 'Unauthorized access!!'}]
     print(f" Processing data: {test_list_dict}")
     log_processor.ingest(test_list_dict)
     print(" Extracting 2 values...")
     for i in range(2):
         print(f" Log entry {i}: {log_processor.output()[1]}")
+
 
 if __name__ == "__main__":
     main()
