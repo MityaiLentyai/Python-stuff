@@ -21,37 +21,15 @@ class DataProcessor(ABC):
         return self._extracted_count, self._data.pop(0)
 
 
-class DataStream:
-    def __init__(self) -> None:
-        self._processors: list[DataProcessor] = []
 
-    def register_processor(self, proc: DataProcessor) -> None:
-        if proc not in self._processors:
-            self._processors.append(proc)
-
-    def process_stream(self, stream: list[Any]) -> None:
-        """Analyzes each element and polymorphically routes it to an appropriate processor."""
-        for item in stream:
-            routed = False
-            for processor in self._processors:
-                if processor.validate(item):
-                    processor.ingest(item)
-                    routed = True
-                    break  # Element handled, move to the next item in the stream
-
-            if not routed:
-                print(
-                    f"[ERROR] No registered processor can handle element: {item} (Type: {type(item).__name__})")
 
     def print_processors_stats(self) -> None:
-        """Prints current stream and ingestion queue statistics for each processor."""
-        print("\n--- Processors Statistics ---")
+        print("\n--- DataStream Statistics ---")
         for proc in self._processors:
             name = proc.__class__.__name__
             print(
                 f" * {name}: Items in queue = {proc.queue_size}, Total extracted so far = {proc._extracted_count}")
         print("-----------------------------\n")
-
 
 class NumericProcessor(DataProcessor):
 
@@ -122,10 +100,44 @@ class LogProcessor(DataProcessor):
                 self._data.append(
                     f"{data['log_level']}: {data['log_message']}")
 
+class DataStream:
+    def __init__(self, name) -> None:
+        self._processors: list[DataProcessor] = []
+
+    def register_processor(self, proc: DataProcessor) -> None:
+        if proc not in self._processors:
+            self._processors.append(proc)
+        # what happens if proc IS already there?
+
+    def process_stream(self, stream: list[Any]) -> None:
+        """main func of processing"""
+        for item in stream:
+            routed = False
+            for processor in self._processors:
+                if processor.validate(item):
+                    processor.ingest(item)
+                    routed = True
+                    break  # Element handled, move to the next item in the stream
+                elif not processor.validate(item):
+                    print("DataStream error - Can't process element in stream: ",item)
+            if not routed:
+                print(
+                    f"[ERROR] No registered processor can handle element: {item} (Type: {type(item).__name__})")
+    def print_processors_stats(self) -> None:
+        if not self._processors:
+            print("No processor found, no data")
 
 def main() -> None:
     print("=== Code Nexus - Data Stream ===\n")
-
-
+    print("Initialize Data Stream...")
+    stream = DataStream("test_stream")
+    stream.print_processors_stats()
+    print()
+    print("Registering Numeric Processor\n")
+    test_data = ['Hello world', [3.14, -1, 2.71],
+                 [{'log_level': 'WARNING', 'log_message': 'Telnet access! Use ssh instead'},
+                                                   {'log_level': 'INFO', 'log_message': 'User wil isconnected'}], 42,
+                 ['Hi', 'five']]
+    print("Send first batch of data on stream:", test_data)
 if __name__ == "__main__":
     main()
