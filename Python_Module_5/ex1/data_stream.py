@@ -6,7 +6,12 @@ class DataProcessor(ABC):
 
     def __init__(self) -> None:
         self._extracted_count: int = 0
+        self._total_processed: int = 0
         self._data: list[str] = []
+
+    @property
+    def queue_size(self) -> int:
+        return len(self._data)
 
     @abstractmethod
     def validate(self, data: Any) -> bool:
@@ -17,19 +22,11 @@ class DataProcessor(ABC):
         pass
 
     def output(self) -> tuple[int, str]:
+        if not self._data:
+            raise IndexError("No items remaining to extract.")
         self._extracted_count += 1
         return self._extracted_count, self._data.pop(0)
 
-
-
-
-    def print_processors_stats(self) -> None:
-        print("\n--- DataStream Statistics ---")
-        for proc in self._processors:
-            name = proc.__class__.__name__
-            print(
-                f" * {name}: Items in queue = {proc.queue_size}, Total extracted so far = {proc._extracted_count}")
-        print("-----------------------------\n")
 
 class NumericProcessor(DataProcessor):
 
@@ -51,15 +48,18 @@ class NumericProcessor(DataProcessor):
         if isinstance(data, list):
             for item in data:
                 self._data.append(str(item))
+                self._total_processed += 1
         else:
             self._data.append(str(data))
+            self._total_processed += 1
 
 
 class TextProcessor(DataProcessor):
 
     def validate(self, data: Any) -> bool:
-        if (isinstance(data, str) or isinstance(data, list) and
-                all(isinstance(x, str) for x in data)):
+        if isinstance(data, str):
+            return True
+        if isinstance(data, list) and all(isinstance(x, str) for x in data):
             return True
         return False
 
@@ -67,23 +67,24 @@ class TextProcessor(DataProcessor):
         if not self.validate(data):
             raise TypeError("Improper text data")
         if isinstance(data, list):
-            self._data.extend(
-                data)  # because they want as separate strings
+            for item in data:
+                self._data.append(item)
+                self._total_processed += 1
         else:
             self._data.append(data)
+            self._total_processed += 1
 
 
 class LogProcessor(DataProcessor):
 
     def validate(self, data: Any) -> bool:
         if isinstance(data, dict):
-            return all(isinstance(k, str) and isinstance(v, str) for k, v in
-                       data.items())
+            return "log_level" in data and "log_message" in data
         if isinstance(data, list):
-            return all(
-                isinstance(item, dict) and all(
-                    isinstance(k, str) and isinstance(v, str) for k, v in
-                    item.items())
+            return len(data) > 0 and all(
+                isinstance(item,
+                           dict) and "log_level" in item and
+                "log_message" in item
                 for item in data
             )
         return False
@@ -91,53 +92,103 @@ class LogProcessor(DataProcessor):
     def ingest(self, data: dict[str, str] | list[dict[str, str]]) -> None:
         if not self.validate(data):
             raise TypeError("Improper log data")
+        if isinstance(data, list):
+            for dct in data:
+                self._data.append(f"{dct['log_level']}: {dct['log_message']}")
+                self._total_processed += 1
         else:
-            if isinstance(data, list):
-                for dct in data:
-                    self._data.append(
-                        f"{dct['log_level']}: {dct['log_message']}")
-            else:
-                self._data.append(
-                    f"{data['log_level']}: {data['log_message']}")
+            self._data.append(f"{data['log_level']}: {data['log_message']}")
+            self._total_processed += 1
+
 
 class DataStream:
-    def __init__(self, name) -> None:
+
+    def __init__(self, name: str) -> None:
+        self.name: str = name
         self._processors: list[DataProcessor] = []
 
     def register_processor(self, proc: DataProcessor) -> None:
         if proc not in self._processors:
             self._processors.append(proc)
-        # what happens if proc IS already there?
 
     def process_stream(self, stream: list[Any]) -> None:
-        """main func of processing"""
         for item in stream:
             routed = False
             for processor in self._processors:
                 if processor.validate(item):
                     processor.ingest(item)
                     routed = True
-                    break  # Element handled, move to the next item in the stream
-                elif not processor.validate(item):
-                    print("DataStream error - Can't process element in stream: ",item)
+                    break
             if not routed:
                 print(
-                    f"[ERROR] No registered processor can handle element: {item} (Type: {type(item).__name__})")
+                    f"DataStream error - "
+                    f"Can't process element in stream: {item}")
+
     def print_processors_stats(self) -> None:
+        print("== DataStream statistics ==")
         if not self._processors:
             print("No processor found, no data")
+            return
 
-def main() -> None:
+        for proc in self._processors:
+            # Map class names to clean display labels
+            name_map = {
+                "NumericProcessor": "Numeric Processor",
+                "TextProcessor": "Text Processor",
+                "LogProcessor": "Log Processor"
+            }
+            display_name = name_map.get(proc.__class__.__name__,
+                                        proc.__class__.__name__)
+            print(
+                f"{display_name}: total {proc._total_processed} items "
+                f"processed, "
+                f"remaining {proc.queue_size} on processor")
+
+
+if __name__ == "__main__":
     print("=== Code Nexus - Data Stream ===\n")
     print("Initialize Data Stream...")
     stream = DataStream("test_stream")
     stream.print_processors_stats()
     print()
+
     print("Registering Numeric Processor\n")
-    test_data = ['Hello world', [3.14, -1, 2.71],
-                 [{'log_level': 'WARNING', 'log_message': 'Telnet access! Use ssh instead'},
-                                                   {'log_level': 'INFO', 'log_message': 'User wil isconnected'}], 42,
-                 ['Hi', 'five']]
+    numeric_proc = NumericProcessor()
+    stream.register_processor(numeric_proc)
+
+    test_data = [
+        'Hello world',
+        [3.14, -1, 2.71],
+        [{'log_level': 'WARNING',
+          'log_message': 'Telnet access! Use ssh instead'},
+         {'log_level': 'INFO', 'log_message': 'User wil isconnected'}],
+        42,
+        ['Hi', 'five']
+    ]
+
     print("Send first batch of data on stream:", test_data)
-if __name__ == "__main__":
-    main()
+    stream.process_stream(test_data)
+    stream.print_processors_stats()
+    print()
+
+    print("Registering other data processors")
+    text_proc = TextProcessor()
+    log_proc = LogProcessor()
+    stream.register_processor(text_proc)
+    stream.register_processor(log_proc)
+
+    print("Send the same batch again")
+    stream.process_stream(test_data)
+    stream.print_processors_stats()
+    print()
+
+    print(
+        "Consume some elements from the data processors: "
+        "Numeric 3, Text 2, Log 1")
+    for _ in range(3):
+        numeric_proc.output()
+    for _ in range(2):
+        text_proc.output()
+    log_proc.output()
+
+    stream.print_processors_stats()
