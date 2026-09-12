@@ -7,7 +7,7 @@ def healing_potion() -> str:
             f" ’{create_earth()}’ and ’{create_air()}'")
 
 
-def strength_potion():
+def strength_potion() -> str:
     return (f"Strength potion brewed"
             f" with ’{create_fire()}’ and"
             f" ’{create_water()}'")
