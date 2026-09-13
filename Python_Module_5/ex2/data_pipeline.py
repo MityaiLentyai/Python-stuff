@@ -232,9 +232,9 @@ def main() -> None:
         ['I love AI', 'LLMs are wonderful', 'Stay healthy'],
         [{'log_level': 'ERROR', 'log_message': '500 server crash'},
          {'log_level': 'NOTICE',
-          'log_message': 'Certificate expires in 10 days'}],
-    ,
-    ['World hello']
+          'log_message': 'Certificate expires in 10 days'}]
+        ,
+        ['World hello']
     ]
     print(f"\nSend another batch of data: {batch_2}\n")
     stream.process_stream(batch_2)
