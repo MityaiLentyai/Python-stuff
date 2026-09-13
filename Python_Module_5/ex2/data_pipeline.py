@@ -3,35 +3,29 @@ from typing import Any, Protocol
 
 
 class ExportPlugin(Protocol):
-    """Protocol enabling a duck-typed plugin system for exporting processing metrics."""
 
     def process_output(self, data: list[tuple[int, str]]) -> None:
         ...
 
 
 class CSVExportPlugin:
-    """Manually serializes processor queues into a CSV formatted string."""
 
     def process_output(self, data: list[tuple[int, str]]) -> None:
         if not data:
             return
         print("CSV Output:")
-        # Join values with commas as per standard CSV format requirements
         csv_string = ",".join(item[1] for item in data)
         print(csv_string)
 
 
 class JSONExportPlugin:
-    """Manually serializes processor queues into valid JSON strings with structured keys."""
 
     def process_output(self, data: list[tuple[int, str]]) -> None:
         if not data:
             return
         print("JSON Output:")
-        # Build valid JSON structure manually by generating incremental "item_X" keys
         kv_pairs = []
         for index, val in data:
-            # Escape inner double quotes inside messages to keep JSON strings valid
             escaped_val = val.replace('"', '\\"')
             kv_pairs.append(f'"item_{index}": "{escaped_val}"')
 
@@ -119,8 +113,8 @@ class LogProcessor(DataProcessor):
             return "log_level" in data and "log_message" in data
         if isinstance(data, list):
             return len(data) > 0 and all(
-                isinstance(item,
-                           dict) and "log_level" in item and "log_message" in item
+                isinstance(item, dict) and "log_level" in item
+                and "log_message" in item
                 for item in data
             )
         return False
@@ -157,18 +151,16 @@ class DataStream:
                     break
             if not routed:
                 print(
-                    f"DataStream error - Can't process element in stream: {item}")
+                    f"DataStream error - "
+                    f"Can't process element in stream: {item}")
 
     def output_pipeline(self, nb: int, plugin: ExportPlugin) -> None:
-        """Consumes up to 'nb' elements from each processor and pushes them to the exporter."""
         for proc in self._processors:
             extracted_items = []
-            # Stop safely if the number requested exceeds items in queue
             items_to_take = min(nb, proc.queue_size)
             for _ in range(items_to_take):
                 extracted_items.append(proc.output())
 
-            # Send the batch array out to the plugin handler
             if extracted_items:
                 plugin.process_output(extracted_items)
 
@@ -187,7 +179,8 @@ class DataStream:
             display_name = name_map.get(proc.__class__.__name__,
                                         proc.__class__.__name__)
             print(
-                f"{display_name}: total {proc._total_processed} items processed, "
+                f"{display_name}: total "
+                f"{proc._total_processed} items processed, "
                 f"remaining {proc.queue_size} on processor")
 
 
@@ -205,7 +198,6 @@ def main() -> None:
     stream.register_processor(text_proc)
     stream.register_processor(log_proc)
 
-    # --- BATCH 1 ---
     batch_1 = [
         'Hello world',
         [3.14, -1, 2.71],
@@ -219,28 +211,24 @@ def main() -> None:
     stream.process_stream(batch_1)
     stream.print_processors_stats()
 
-    # --- PIPELINE EXPORT 1 (CSV) ---
     print("\nSend 3 processed data from each processor to a CSV plugin:")
     csv_plugin = CSVExportPlugin()
     stream.output_pipeline(3, csv_plugin)
     print()
     stream.print_processors_stats()
 
-    # --- BATCH 2 ---
     batch_2 = [
         21,
         ['I love AI', 'LLMs are wonderful', 'Stay healthy'],
         [{'log_level': 'ERROR', 'log_message': '500 server crash'},
          {'log_level': 'NOTICE',
-          'log_message': 'Certificate expires in 10 days'}]
-        ,
+          'log_message': 'Certificate expires in 10 days'}],
         ['World hello']
     ]
     print(f"\nSend another batch of data: {batch_2}\n")
     stream.process_stream(batch_2)
     stream.print_processors_stats()
 
-    # --- PIPELINE EXPORT 2 (JSON) ---
     print("\nSend 5 processed data from each processor to a JSON plugin:")
     json_plugin = JSONExportPlugin()
     stream.output_pipeline(5, json_plugin)
