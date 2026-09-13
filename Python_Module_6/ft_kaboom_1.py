@@ -1,7 +1,8 @@
+import alchemy.grimoire.dark_spellbook
 
 print("=== Kaboom 1 ===")
 print("Access to alchemy/grimoire/dark_spellbook.py directly")
-print(f"Test import now - THIS WILL RAISE AN UNCAUGHT EXCEPTION: ")
-from alchemy.grimoire.dark_spellbook import dark_spell_record
+print("Test import now - THIS WILL RAISE AN UNCAUGHT EXCEPTION: ")
 
-print(f"{dark_spell_record('Fantasy','Earth')}")
+print(
+    f"{alchemy.grimoire.dark_spellbook.dark_spell_record('Fantasy', 'Earth')}")

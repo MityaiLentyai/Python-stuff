@@ -1,5 +1,6 @@
 from . import light_spellbook
 
+
 def validate_ingredients(ingredients: str) -> str:
     allowed = light_spellbook.light_spell_allowed_ingredients()
 
