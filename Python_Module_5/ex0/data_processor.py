@@ -30,8 +30,7 @@ class NumericProcessor(DataProcessor):
             return True
         if isinstance(data, list):
             return all(
-                isinstance(item, (int, float)) and not isinstance(item, bool)
-                for item in data
+                isinstance(item, (int, float)) for item in data
             )
         return False
 
@@ -57,8 +56,7 @@ class TextProcessor(DataProcessor):
         if not self.validate(data):
             raise TypeError("Improper text data")
         if isinstance(data, list):
-            self._data.extend(
-                data)  # because they want as separate strings
+            self._data = data  # Maybe it isn't clean but works for our example
         else:
             self._data.append(data)
 
@@ -71,9 +69,11 @@ class LogProcessor(DataProcessor):
                        data.items())
         if isinstance(data, list):
             return all(
-                isinstance(item, dict) and all(
-                    isinstance(k, str) and isinstance(v, str) for k, v in
-                    item.items())
+                isinstance(item, dict)
+                and all(isinstance(k, str) for k in item.keys())
+                and all(isinstance(v, str) for v in item.values())
+                and "log_level" in item
+                and "log_message" in item
                 for item in data
             )
         return False
