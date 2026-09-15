@@ -184,7 +184,7 @@ class DataStream:
                 f"remaining {proc.queue_size} on processor")
 
 
-def main() -> None:
+if __name__ == "__main__":
     print("--- Code Nexus - Data Pipeline ---")
     print("\nInitialize Data Stream...\n")
     stream = DataStream("production_pipeline")
@@ -217,14 +217,13 @@ def main() -> None:
     print()
     stream.print_processors_stats()
 
-    batch_2 = [
-        21,
-        ['I love AI', 'LLMs are wonderful', 'Stay healthy'],
-        [{'log_level': 'ERROR', 'log_message': '500 server crash'},
-         {'log_level': 'NOTICE',
-          'log_message': 'Certificate expires in 10 days'}],
-        ['World hello']
-    ]
+    batch_2 = [21, ['I love AI', 'LLMs are wonderful', 'Stay healthy'],
+               [{'log_level':
+                     'ERROR', 'log_message': '500 server crash'},
+                {'log_level': 'NOTICE', 'log_message': 'Certificate'
+                                                       'expires in 10 days'}],
+               [32, 42, 64, 84, 128, 168], 'World hello']
+
     print(f"\nSend another batch of data: {batch_2}\n")
     stream.process_stream(batch_2)
     stream.print_processors_stats()
@@ -234,7 +233,3 @@ def main() -> None:
     stream.output_pipeline(5, json_plugin)
     print()
     stream.print_processors_stats()
-
-
-if __name__ == "__main__":
-    main()
