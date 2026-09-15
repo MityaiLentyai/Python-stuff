@@ -5,7 +5,7 @@ from typing import Any, Protocol
 class ExportPlugin(Protocol):
 
     def process_output(self, data: list[tuple[int, str]]) -> None:
-        ...
+        pass
 
 
 class CSVExportPlugin:
