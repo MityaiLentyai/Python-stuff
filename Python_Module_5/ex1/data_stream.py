@@ -201,10 +201,20 @@ if __name__ == "__main__":
     print(
         "Consume some elements from the data processors:"
         " Numeric 3, Text 2, Log 1")
-    for _ in range(3):
-        numeric_proc.output()
-    for _ in range(2):
-        text_proc.output()
-    log_proc.output()
+    print()
 
+    print("Registering other data processors")
+    text_proc = TextProcessor()
+    log_proc = LogProcessor()
+    data_stream.register_processor(text_proc)
+    data_stream.register_processor(log_proc)
+
+    print("Send the same batch again")
+    data_stream.process_stream(test_data)
+    data_stream.print_processors_stats()
+    print()
+
+    print(
+        "Consume some elements from the data processors: "
+        "Numeric 3, Text 2, Log 1")
     data_stream.print_processors_stats()
