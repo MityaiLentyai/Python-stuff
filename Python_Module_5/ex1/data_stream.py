@@ -9,10 +9,6 @@ class DataProcessor(ABC):
         self._total_processed: int = 0
         self._data: list[str] = []
 
-    @property
-    def queue_size(self) -> int:
-        return len(self._data)
-
     @abstractmethod
     def validate(self, data: Any) -> bool:
         pass
@@ -20,6 +16,15 @@ class DataProcessor(ABC):
     @abstractmethod
     def ingest(self, data: Any) -> None:
         pass
+
+    @abstractmethod
+    def show_stats(self) -> None:
+        pass
+
+    @property
+    def queue_size(
+            self) -> int:
+        return len(self._data)
 
     def output(self) -> tuple[int, str]:
         if not self._data:
@@ -33,18 +38,15 @@ class NumericProcessor(DataProcessor):
     def validate(self, data: Any) -> bool:
         if isinstance(data, bool):
             return False
-        if isinstance(data, float):
-            return True
-        if isinstance(data, list):
-            return all(
-                isinstance(item, float) and not isinstance(item, bool)
-                for item in data
-            )
-        return False
+        return (isinstance(data, (int, float))
+                or (isinstance(data, list) and
+                    all(isinstance(x, (int, float)) and not isinstance(x, bool)
+                        for x in data)))
 
     def ingest(self, data: float | list[float]) -> None:
         if not self.validate(data):
             raise TypeError("Improper numeric data")
+
         if isinstance(data, list):
             for item in data:
                 self._data.append(str(item))
@@ -52,6 +54,11 @@ class NumericProcessor(DataProcessor):
         else:
             self._data.append(str(data))
             self._total_processed += 1
+
+    def show_stats(self) -> None:
+        print(
+            f"Numeric Processor: total {self._total_processed} items processed"
+            f", remaining {self.queue_size} on processor")
 
 
 class TextProcessor(DataProcessor):
@@ -74,6 +81,11 @@ class TextProcessor(DataProcessor):
             self._data.append(data)
             self._total_processed += 1
 
+    def show_stats(self) -> None:
+        print(
+            f"Text Processor: total {self._total_processed} items processed,"
+            f" remaining {self.queue_size} on processor")
+
 
 class LogProcessor(DataProcessor):
 
@@ -81,12 +93,12 @@ class LogProcessor(DataProcessor):
         if isinstance(data, dict):
             return "log_level" in data and "log_message" in data
         if isinstance(data, list):
-            return len(data) > 0 and all(
-                isinstance(item,
-                           dict) and "log_level" in item and
-                "log_message" in item
-                for item in data
-            )
+            return (len(data) > 0
+                    and all(isinstance(item, dict)
+                            and "log_level" in item
+                            and "log_message" in item
+                            for item in data
+                            ))
         return False
 
     def ingest(self, data: dict[str, str] | list[dict[str, str]]) -> None:
@@ -99,6 +111,11 @@ class LogProcessor(DataProcessor):
         else:
             self._data.append(f"{data['log_level']}: {data['log_message']}")
             self._total_processed += 1
+
+    def show_stats(self) -> None:
+        print(
+            f"Log Processor: total {self._total_processed} items processed,"
+            f" remaining {self.queue_size} on processor")
 
 
 class DataStream:
@@ -131,7 +148,6 @@ class DataStream:
             return
 
         for proc in self._processors:
-            # Map class names to clean display labels
             name_map = {
                 "NumericProcessor": "Numeric Processor",
                 "TextProcessor": "Text Processor",
@@ -141,8 +157,8 @@ class DataStream:
                                         proc.__class__.__name__)
             print(
                 f"{display_name}: total {proc._total_processed} items "
-                f"processed, "
-                f"remaining {proc.queue_size} on processor")
+                f"processed, remaining {proc.queue_size} on processor"
+            )
 
 
 if __name__ == "__main__":
@@ -168,27 +184,27 @@ if __name__ == "__main__":
 
     print("Send first batch of data on stream:", test_data)
     data_stream.process_stream(test_data)
-    # stream.print_processors_stats()
+    data_stream.print_processors_stats()
     print()
-    #
-    # print("Registering other data processors")
-    # text_proc = TextProcessor()
-    # log_proc = LogProcessor()
-    # stream.register_processor(text_proc)
-    # stream.register_processor(log_proc)
-    #
-    # print("Send the same batch again")
-    # stream.process_stream(test_data)
-    # stream.print_processors_stats()
-    # print()
-    #
-    # print(
-    #     "Consume some elements from the data processors: "
-    #     "Numeric 3, Text 2, Log 1")
-    # for _ in range(3):
-    #     numeric_proc.output()
-    # for _ in range(2):
-    #     text_proc.output()
-    # log_proc.output()
-    #
-    # stream.print_processors_stats()
+
+    print("Registering other data processors")
+    text_proc = TextProcessor()
+    log_proc = LogProcessor()
+    data_stream.register_processor(text_proc)
+    data_stream.register_processor(log_proc)
+
+    print("Send the same batch again")
+    data_stream.process_stream(test_data)
+    data_stream.print_processors_stats()
+    print()
+
+    print(
+        "Consume some elements from the data processors:"
+        " Numeric 3, Text 2, Log 1")
+    for _ in range(3):
+        numeric_proc.output()
+    for _ in range(2):
+        text_proc.output()
+    log_proc.output()
+
+    data_stream.print_processors_stats()
