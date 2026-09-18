@@ -32,4 +32,3 @@ if __name__ == "__main__":
     print(big_transformer.transform())
     print(big_transformer.attack())
     print(big_transformer.revert())
-    transformation_creature_factory = TransformCreatureFactory()

@@ -52,7 +52,7 @@ class Morphagon(Creature, TransformCapability):
     def attack(self) -> str:
         if not self.shifted:
             return f"{self.name} attacks normally."
-        return f"{self.name}  unleashes a devastating morph strike!"
+        return f"{self.name} unleashes a devastating morph strike!"
 
     def transform(self) -> str:
         self.shifted = True
@@ -60,4 +60,4 @@ class Morphagon(Creature, TransformCapability):
 
     def revert(self) -> str:
         self.shifted = False
-        return f"{self.name} stabilizes its form"
+        return f"{self.name} stabilizes its form."

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class Creature(ABC):
     def __init__(self, name: str = "Unknown creature",
-                 creature_type: str = "Unknown type"):
+                 creature_type: str = "Unknown type") -> None:
         self.name = name
         self.type = creature_type
 
@@ -16,7 +16,7 @@ class Creature(ABC):
 
 
 class Flameling(Creature):
-    def __init__(self, name: str = "Flameling"):
+    def __init__(self, name: str = "Flameling") -> None:
         super().__init__(name=name, creature_type="Fire")
 
     def attack(self) -> str:
