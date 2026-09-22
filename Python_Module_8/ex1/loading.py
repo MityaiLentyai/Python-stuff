@@ -2,9 +2,9 @@ from importlib.util import find_spec
 from importlib.metadata import version
 
 try:
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import pandas as pd
+    import numpy as np  # type: ignore
+    import matplotlib.pyplot as plt  # type: ignore
+    import pandas as pd  # type: ignore
 except ImportError as e:
     missing_module = e.name if hasattr(e, 'name') else str(e)
     print(f"❌ Error: Required dependency '{missing_module}' is missing.")
