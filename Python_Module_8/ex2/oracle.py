@@ -74,11 +74,9 @@ def main() -> None:
             )
             sys.exit(1)
 
-    # 5. Run Environment-Specific Validation Rules
     validate_config(matrix_mode, current_config)
 
-    # 6. Execute Program logic if validations pass
-    print(f"=== Oracle Matrix Shield Initiated ===")
+    print("=== Oracle Matrix Shield Initiated ===")
     print(f"Environment Status: {matrix_mode.upper()}")
     print("Loaded configuration successfully:")
     for key, val in current_config.items():
