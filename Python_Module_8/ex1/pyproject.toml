@@ -1,5 +1,5 @@
 [project]
-name = "ex1"
+name = "loading"
 version = "0.1.0"
 description = ""
 authors = [
@@ -8,8 +8,8 @@ authors = [
 requires-python = ">=3.12,<3.14"
 dependencies = [
     "numpy (>=2.5.3,<3.0.0)",
-    "pandas (>=3.0.6,<4.0.0)",
-    "matplotlib (>=3.11.2,<4.0.0)"
+    "matplotlib (>=3.11.2,<4.0.0)",
+    "pandas (>=3.0.6,<4.0.0)"
 ]
 
 
