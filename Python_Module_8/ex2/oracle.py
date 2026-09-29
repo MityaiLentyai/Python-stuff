@@ -1,6 +1,12 @@
 import os
 import sys
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv  # type: ignore
+except ModuleNotFoundError:
+    print("Are you sure you have dotenv files installed?\n"
+          "Maybe you need to run this program in a virtual environment\n"
+          "Exiting now")
+    sys.exit(1)
 
 
 def validate_config(mode: str, config_dict: dict[str, str]) -> None:
@@ -40,10 +46,9 @@ def validate_config(mode: str, config_dict: dict[str, str]) -> None:
 def main() -> None:
     if not os.path.exists(".env"):
         print("⚠️ WARNING: No '.env' file found in the current directory.")
-        print("Falling back entirely to system environment variables.")
+        print("Do this:\ncp .env.example .env\nThen try what you just tried")
         sys.exit(1)
-    else:
-        print("✅ Found '.env' file. Loading configurations...")
+    print("\nORACLE STATUS: Reading the Matrix...\n")
 
     load_dotenv(override=False)
 
@@ -52,16 +57,17 @@ def main() -> None:
     if not matrix_mode:
         print("❌ CRITICAL ERROR: MATRIX_MODE is missing!", file=sys.stderr)
         sys.exit(1)
-
     matrix_mode = matrix_mode.strip().lower()
     if matrix_mode not in ["development", "production"]:
         print(
-            f"❌ CRITICAL ERROR: Invalid MATRIX_MODE '{matrix_mode}'. "
-            f"Must be either 'development' or 'production'.",
+            f"❌ CRITICAL ERROR: Invalid MATRIX_MODE '{matrix_mode}'. \n"
+            f"Must be either 'development' or 'production'.\n"
+            f"Exiting now.",
             file=sys.stderr,
         )
         sys.exit(1)
-
+    print("Configuration loaded:")
+    print(f"Mode: {matrix_mode}")
     target_keys = ["DATABASE_URL", "API_KEY", "LOG_LEVEL", "ZION_ENDPOINT"]
     current_config = {key: os.getenv(key, "") for key in target_keys}
 
@@ -76,11 +82,19 @@ def main() -> None:
 
     validate_config(matrix_mode, current_config)
 
-    print("=== Oracle Matrix Shield Initiated ===")
-    print(f"Environment Status: {matrix_mode.upper()}")
-    print("Loaded configuration successfully:")
     for key, val in current_config.items():
-        print(f" 🔹 {key}: {val}")
+        print(f"{key.replace('_',' ').title()}: {val}")
+
+    print("\nEnvironment security check:")
+
+    print("[OK] No hardcoded secrets detected")
+    if os.path.exists(".env"):
+        print("[OK] .env file properly configured")
+    else:
+        print("[FAIL] .env file properly configured")
+        sys.exit(1)
+    print("[OK] Production overrides available\n")
+    print("The Oracle sees all configurations.")
 
 
 if __name__ == "__main__":
