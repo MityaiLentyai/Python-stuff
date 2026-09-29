@@ -1,6 +1,7 @@
 from enum import Enum
 
 from pydantic import BaseModel, Field, model_validator  # type: ignore
+from pydantic import ValidationError  # type: ignore
 from datetime import datetime
 
 
@@ -68,7 +69,7 @@ def main() -> None:
     print("======================================")
     print("Expected validation error:")
     try:
-        wrong_contact = AlienContact(contact_id="A_2024_001",
+        wrong_contact = AlienContact(contact_id="AC_2024_001",
                                      contact_type='physical',
                                      location="Area 51, Nevada",
                                      signal_strength=10,
@@ -77,10 +78,11 @@ def main() -> None:
                                      timestamp=datetime.now(),
                                      # message_received='Greetings from Zeta '
                                      #                  'Reticuli',
-                                     is_verified=False)
+                                     is_verified=True)
         wrong_contact.show()
-    except ValueError as e:
-        print(e)
+    except ValidationError as e:
+        print(e.errors()[0]["msg"].replace("Value error, ",""))
+
 
 if __name__ == "__main__":
     main()

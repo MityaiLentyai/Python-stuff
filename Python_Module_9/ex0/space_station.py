@@ -1,5 +1,9 @@
-from pydantic import BaseModel, Field, ValidationError  # type: ignore
-from datetime import datetime
+try:
+    from pydantic import BaseModel, Field, ValidationError  # type: ignore
+    from datetime import datetime
+except ModuleNotFoundError:
+    print("C'mon man. Enable the virtual env & pip install pydantic, now bye")
+    exit(1)
 
 
 class Station(BaseModel):
