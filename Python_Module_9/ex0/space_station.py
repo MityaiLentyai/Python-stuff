@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field  # type: ignore
+from pydantic import BaseModel, Field, ValidationError  # type: ignore
 from datetime import datetime
 
 
@@ -54,7 +54,7 @@ Expected validation error:""")
                                 last_maintenance=datetime.now())
         station2.display()
     except ValueError as e:
-        print(e)
+        print(e.errors()[0]["msg"])  #str(e) gives you the full Pydantic error
 
 
 if __name__ == "__main__":
