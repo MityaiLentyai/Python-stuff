@@ -1,5 +1,5 @@
 try:
-    from pydantic import BaseModel, Field, ValidationError  # type: ignore
+    from pydantic import BaseModel, Field, ValidationError
     from datetime import datetime
 except ModuleNotFoundError:
     print("C'mon man. Enable the virtual env & pip install pydantic, now bye")
@@ -32,13 +32,13 @@ class Station(BaseModel):
 
 def main() -> None:
     right_station = Station(station_id="ISS001",
-                                 name="International Space Station",
-                                 crew_size=6,
-                                 power_level=85.5,
-                                 oxygen_level=92.3,
-                                 last_maintenance=datetime.now(),
-                                 # notes="Ball Sack"
-                                 )
+                            name="International Space Station",
+                            crew_size=6,
+                            power_level=85.5,
+                            oxygen_level=92.3,
+                            last_maintenance=datetime.now(),
+                            # notes="Ball Sack"
+                            )
 
     print("""
 Space Station Data Validation
@@ -51,14 +51,14 @@ Space Station Data Validation
 Expected validation error:""")
     try:
         station2 = Station(station_id="ISS002",
-                                name="International Space Station",
-                                crew_size=21,
-                                power_level=85.5,
-                                oxygen_level=92.3,
-                                last_maintenance=datetime.now())
+                           name="International Space Station",
+                           crew_size=21,
+                           power_level=85.5,
+                           oxygen_level=92.3,
+                           last_maintenance=datetime.now())
         station2.display()
-    except ValueError as e:
-        print(e.errors()[0]["msg"])  #str(e) gives you the full Pydantic error
+    except ValidationError as e:
+        print(e.errors()[0]["msg"])  # str(e) gives you the full Pydantic error
 
 
 if __name__ == "__main__":
