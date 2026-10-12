@@ -11,3 +11,5 @@ def echo_validator(text: str) -> bool:
         return True
     else:
         return False
+
+print(echo_validator("hello"))
